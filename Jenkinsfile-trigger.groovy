@@ -15,6 +15,7 @@ pipeline {
 
                     // Wait for approval
                     timeout(time: 30, unit: 'MINUTES') {
+                        // Wait for user input
                         def userInput = input(
                             id: 'userInput',
                             message: 'Do you approve the execution of this job?',
@@ -29,8 +30,11 @@ pipeline {
                         )
 
                         // Validate user approval and email
-                        if (userInput && env.CI_USER_EMAIL == designatedApproverEmail) {
+                        if (userInput && env.MAIL_TO == designatedApproverEmail) {
                             echo "Job approved by designated approver."
+                            // Add job execution steps here
+                            // For example:
+                            sh 'echo "Executing job..."'
                         } else {
                             echo "Job not approved or unauthorized. Exiting the pipeline."
                             currentBuild.result = 'ABORTED'
