@@ -23,7 +23,7 @@ pipeline {
                         def approvedBy = currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause).userId
 
                         // Validate the approval and the user
-                        if (userInput == 'Yes' && approvedBy == 'admin') {
+                        if (userInput == 'Yes' && approvedBy == 'admin1') {
                             echo "Job approved by user: admin"
                         } else {
                             echo "Job not approved. Exiting the pipeline."
