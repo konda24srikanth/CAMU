@@ -5,7 +5,7 @@ pipeline {
         stage('Trigger Job After Approval') {
             steps {
                 // Send approval request email to designated approver
-                mail to: 'admin@example.com',
+                mail to: 'konda.srikanth@walkingtree.tech',
                      subject: "Approval Needed: Execute Job",
                      body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
@@ -28,7 +28,7 @@ pipeline {
                     // Validate user approval by checking the username of the user who approved
                     def approvedBy = env.APPROVED_BY ?: 'unknown'
 
-                    if (userInput && approvedBy == 'admin') {
+                    if (userInput && approvedBy == 'srikanth') {
                         echo "Job approved by user 'admin'. Proceeding with job execution..."
                         // Add job execution steps here
                         // For example:
