@@ -1,45 +1,42 @@
 pipeline {
     agent any
-options {
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
-}
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
+    }
+
     stages {
         stage('Checkout the Code') {
             steps {
-               git branch: 'test-k8s', credentialsId: 'Git-Token', url: 'https://github.com/Akieni-Yao/dms.git'
+                echo "git clone"
+                // Add git checkout steps here if needed
+                // git branch: 'test-k8s', credentialsId: 'Git-Token', url: 'https://github.com/Akieni-Yao/dms.git'
             }
         }
- stage('Trigger Job After Approval') {
+
+        stage('Trigger Job After Approval') {
             steps {
                 mail to: 'mahaboob.basha@walkingtree.tech',
                      subject: "Approval Needed: Execute Job",
                      body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
-
                 timeout(time: 30, unit: 'MINUTES') {
-
                     script {
-                        def userInput = input(
-                            id: 'userInput',
-                            message: 'Do you approve the execution of this job?',
+                        def approvedBy = input(
+                            id: 'approvalInput',
+                            message: 'Please enter your username for approval verification:',
                             parameters: [
-                                [
-                                    $class: 'BooleanParameterDefinition',
-                                    defaultValue: false,
-                                    description: 'Approve?',
-                                    name: 'APPROVE_JOB'
-                                ]
+                                string(defaultValue: '', description: 'Username', name: 'APPROVED_BY')
                             ]
-                        )
+                        ).APPROVED_BY
 
-
-                        if (userInput) {
-                            echo "Job approved by user."
-
+                        if (approvedBy == 'admin') {
+                            echo "Job approved by admin. Proceeding with job execution."
+                            // Add job execution steps here
                         } else {
-                            echo "Job not approved. Exiting the pipeline."
+                            echo "Job not approved or unauthorized. Exiting the pipeline."
                             currentBuild.result = 'ABORTED'
-                            error("Job execution aborted by user.")
+                            error("Job execution aborted or unauthorized.")
                         }
                     }
                 }
