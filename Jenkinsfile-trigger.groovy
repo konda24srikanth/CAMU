@@ -15,12 +15,16 @@ pipeline {
 
                     // Wait for approval
                     timeout(time: 30, unit: 'MINUTES') {
-                        // Wait for input from the designated approver
                         def userInput = input(
-                            id: 'srikanth',
+                            id: 'userInput',
                             message: 'Do you approve the execution of this job?',
                             parameters: [
-                                booleanParam(defaultValue: false, description: 'Approve?', name: 'APPROVE_JOB')
+                                [
+                                    $class: 'BooleanParameterDefinition',
+                                    defaultValue: false,
+                                    description: 'Approve?',
+                                    name: 'APPROVE_JOB'
+                                ]
                             ]
                         )
 
