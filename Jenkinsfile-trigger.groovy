@@ -30,7 +30,7 @@ pipeline {
                         )
 
                         // Validate user approval and email
-                        if (userInput && env.MAIL_TO == designatedApproverEmail) {
+                        if (userInput == true && env.CHANGE_AUTHOR_EMAIL == designatedApproverEmail) {
                             echo "Job approved by designated approver."
                             // Add job execution steps here
                             // For example:
