@@ -16,7 +16,7 @@ pipeline {
 
         stage('Trigger Job After Approval') {
             steps {
-                mail to: 'mahaboob.basha@walkingtree.tech',
+                mail to: 'konda.srikanth@walkingtree.tech',
                      subject: "Approval Needed: Execute Job",
                      body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
@@ -30,7 +30,7 @@ pipeline {
                             ]
                         ).APPROVED_BY
 
-                        if (approvedBy == 'admin') {
+                        if (approvedBy == 'konda srikanth') {
                             echo "Job approved by admin. Proceeding with job execution."
                             // Add job execution steps here
                         } else {
