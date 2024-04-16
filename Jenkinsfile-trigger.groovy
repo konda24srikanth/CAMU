@@ -2,20 +2,16 @@ pipeline {
     agent any
 
     stages {
-        stage('Trigger Job After Approval') {
+    stage('Trigger Job After Approval') {
             steps {
-                script {
-                    // Define the designated approver's email
-                    def designatedApproverEmail = 'konda.srikanth@walkingtree.tech'
+                mail to: 'konda.srikanth@walkingtree.tech',
+                     subject: "Approval Needed: Execute Job",
+                     body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
-                    // Send approval email only to the designated approver
-                    mail to: designatedApproverEmail,
-                        subject: "Approval Needed: Execute Job",
-                        body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
-                    // Wait for approval
-                    timeout(time: 30, unit: 'MINUTES') {
-                        // Wait for user input
+                timeout(time: 30, unit: 'MINUTES') {
+
+                    script {
                         def userInput = input(
                             id: 'userInput',
                             message: 'Do you approve the execution of this job?',
@@ -29,16 +25,14 @@ pipeline {
                             ]
                         )
 
-                        // Validate user approval and email
-                        if (userInput == true && env.CHANGE_AUTHOR_EMAIL == designatedApproverEmail) {
-                            echo "Job approved by designated approver."
-                            // Add job execution steps here
-                            // For example:
-                            sh 'echo "Executing job..."'
+
+                        if (userInput) {
+                            echo "Job approved by user."
+
                         } else {
-                            echo "Job not approved or unauthorized. Exiting the pipeline."
+                            echo "Job not approved. Exiting the pipeline."
                             currentBuild.result = 'ABORTED'
-                            error("Job execution aborted or unauthorized.")
+                            error("Job execution aborted by user.")
                         }
                     }
                 }
