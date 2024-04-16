@@ -41,26 +41,3 @@ pipeline {
     }
 }
 
-def waitForApproval() {
-    // Implement logic to wait for email approval from konda srikanth
-    def approvalReceived = false
-
-    // Continuously check for approval email
-    // In a real implementation, use a proper mechanism to monitor and process incoming emails
-    // For demonstration, simulate the approval check based on manual input or external system integration
-    // Example: Monitor a specific mailbox or webhook for approval responses
-    // Here, use a simple manual input simulation (replace with actual email processing logic)
-    def userInput = input(
-        id: 'approvalInput',
-        message: 'Has konda srikanth approved the job? (Type "yes" to simulate approval)',
-        parameters: [
-            string(defaultValue: '', description: 'Approval', name: 'APPROVAL')
-        ]
-    ).APPROVAL.trim().toLowerCase()
-
-    if (userInput == 'yes') {
-        approvalReceived = true
-    }
-
-    return approvalReceived
-}
