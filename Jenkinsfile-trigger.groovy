@@ -1,34 +1,32 @@
 pipeline {
     agent any
 
-    options {
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
-    }
-
     stages {
-        stage('Checkout the Code') {
-            steps {
-                echo "git clone"
-                // Add git checkout steps here if needed
-                // git branch: 'test-k8s', credentialsId: 'Git-Token', url: 'https://github.com/Akieni-Yao/dms.git'
-            }
-        }
-
         stage('Trigger Job After Approval') {
             steps {
-                // Send approval request email to konda.srikanth
-                mail to: 'konda.srikanth@walkingtree.tech',
-                     subject: "Approval Needed: Execute Job",
-                     body: "Please approve the execution of the job by replying to this email with 'APPROVE' in the subject line."
+                script {
+                    // Define the designated approver's email
+                    def designatedApproverEmail = 'konda.srikanth@walkingtree.tech'
 
-                // Wait for approval via email
-                timeout(time: 30, unit: 'MINUTES') {
-                    script {
-                        def approved = waitForApproval()
+                    // Send approval email only to the designated approver
+                    mail to: designatedApproverEmail,
+                        subject: "Approval Needed: Execute Job",
+                        body: "Please approve the execution of the job by clicking the following link: ${env.BUILD_URL}input/"
 
-                        if (approved) {
-                            echo "Job approved by konda srikanth. Proceeding with job execution."
-                            // Add job execution steps here
+                    // Wait for approval
+                    timeout(time: 30, unit: 'MINUTES') {
+                        // Wait for input from the designated approver
+                        def userInput = input(
+                            id: 'srikanth',
+                            message: 'Do you approve the execution of this job?',
+                            parameters: [
+                                booleanParam(defaultValue: false, description: 'Approve?', name: 'APPROVE_JOB')
+                            ]
+                        )
+
+                        // Validate user approval and email
+                        if (userInput && env.CI_USER_EMAIL == designatedApproverEmail) {
+                            echo "Job approved by designated approver."
                         } else {
                             echo "Job not approved or unauthorized. Exiting the pipeline."
                             currentBuild.result = 'ABORTED'
@@ -40,4 +38,3 @@ pipeline {
         }
     }
 }
-
