@@ -10,27 +10,25 @@ pipeline {
 
                 timeout(time: 30, unit: 'MINUTES') {
                     script {
+                        // Define a choice parameter for approval
                         def userInput = input(
                             id: 'userInput',
                             message: 'Do you approve the execution of this job?',
-                            parameters: [                     
-                                [
-                                    $class: 'SubmitterParameterDefinition', // Use SubmitterParameter for user-specific approval
-                                    name: 'APPROVE_JOB',
-                                    submitter: 'admin', // Specify the Jenkins User ID for approval
-                                    defaultValue: 'Proceed', // Default value for the approval button
-                                    description: 'Approve this job execution' // Description of the approval parameter
-                                ]
+                            parameters: [
+                                choice(choices: ['Yes', 'No'], description: 'Please select Yes to approve or No to reject', name: 'APPROVE_JOB')
                             ]
                         )
 
-                        // Check the user input
-                        if (userInput == 'Proceed') {
+                        // Get the Jenkins User ID of the user who triggered the approval
+                        def approvedBy = currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause).userId
+
+                        // Validate the approval and the user
+                        if (userInput == 'Yes' && approvedBy == 'admin') {
                             echo "Job approved by user: admin"
                         } else {
                             echo "Job not approved. Exiting the pipeline."
                             currentBuild.result = 'ABORTED'
-                            error("Job execution aborted by user.")
+                            error("Job execution aborted by unauthorized user or not approved.")
                         }
                     }
                 }
